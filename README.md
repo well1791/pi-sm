@@ -1,14 +1,18 @@
 # pi-sm
 
-Session manager for the [pi](https://pi.dev) coding agent.
+Lite session manager for the [pi](https://pi.dev) coding agent.
+
+<picture>
+    <img src="screenshots/1.png" width="100%" alt="lite session manager">
+</picture>
 
 An interactive TUI to **browse, search, rename, fork, hide, and delete** pi
-sessions — plus a quick `/rename` command. Two extensions ship in this package:
+sessions — plus a quick `/rn` command. Two extensions ship in this package:
 
 | Extension      | Command | What it does                                                       |
 | -------------- | ------- | ------------------------------------------------------------------ |
 | `src/index.ts` | `/sm`   | Full-screen session browser: list, filter, rename, fork, delete.   |
-| `src/rename.ts`| `/rename` | Rename the current session inline (`/rename [name]`, or `/rename` to edit). |
+| `src/rename.ts`| `/rn`   | Rename the current session inline (`/rn [name]`, or `/rn` to edit). |
 
 ## Install
 
@@ -20,7 +24,7 @@ pi install git:github.com/well1791/pi-sm
 pi -e git:github.com/well1791/pi-sm
 ```
 
-After installing, run `/sm` or `/rename` inside pi.
+After installing, run `/sm` or `/rn` inside pi.
 
 ## `/sm` — session browser
 
@@ -63,11 +67,11 @@ with the typed name.
 Resuming a session saved under a different model prompts you to keep the active
 model or switch to the session's model.
 
-## `/rename` — quick rename
+## `/rn` — quick rename
 
 ```fish
-/rename my session      # set name directly
-/rename                 # open an editor pre-filled with the current/derived name
+/rn my session      # set name directly
+/rn                 # open an editor pre-filled with the current/derived name
 ```
 
 With no arguments, the current name is derived from the first user message if
@@ -110,10 +114,6 @@ Optional config file at `~/.pi/agent/session-manager.json`:
   ANSI 256 palette code (e.g. `"242"`).
 
 Unspecified keys keep their defaults.
-
-## Screenshots
-
-Screenshots live in [`screenshots/`](./screenshots).
 
 ## License
 
