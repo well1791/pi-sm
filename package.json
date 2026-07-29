@@ -1,7 +1,7 @@
 {
   "name": "pi-sm",
   "version": "0.1.0",
-  "description": "Session manager for the pi coding agent — a TUI to browse, search, rename, fork, hide, and delete sessions, plus a /rename command.",
+  "description": "Lite session manager for the pi coding agent — a TUI to browse, search, rename, fork, hide, and delete sessions, plus a /rn command.",
   "keywords": [
     "pi-package",
     "pi",

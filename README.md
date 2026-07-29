@@ -79,10 +79,13 @@ unset.
 
 ## Configuration
 
-Optional config file at `~/.pi/agent/session-manager.json`:
+Optional config file at `~/.pi/agent/pi-sm.json`:
 
 ```json
 {
+  "commands": {
+    "rename": "rn"
+  },
   "shortcuts": {
     "delete": "ctrl+x",
     "softDelete": "ctrl+d",
@@ -108,6 +111,8 @@ Optional config file at `~/.pi/agent/session-manager.json`:
 }
 ```
 
+- **commands** — override slash-command names. `rename` sets the quick-rename
+  command (default `rn`); requires an extension reload to take effect.
 - **shortcuts** — override any of the `/sm` action keys (values are key names as
   pi's `matchesKey` understands them).
 - **colors** — any color key. Values are either hex (`"#RRGGBB"` → 24-bit) or an

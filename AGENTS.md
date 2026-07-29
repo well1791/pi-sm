@@ -4,12 +4,12 @@ Project-specific guidance for AI agents working in this repo.
 
 ## What this is
 
-A [pi](https://pi.dev) package bundling two extensions for session management:
+A [pi](https://pi.dev) package bundling two extensions for lite session management:
 
 | File            | Command   | Purpose                                                       |
 | --------------- | --------- | ------------------------------------------------------------ |
 | `src/index.ts`  | `/sm`     | Full-screen TUI: browse, search, rename, fork, hide, delete sessions. |
-| `src/rename.ts` | `/rename` | Quick inline rename (`/rename [name]`, or `/rename` to edit). |
+| `src/rename.ts` | `/rn`   | Quick inline rename (`/rn [name]`, or `/rn` to edit).              |
 
 Sister modules (`config`, `constants`, `types`, `tree`, `render`, `dialogs`) support `index.ts`.
 
@@ -53,7 +53,7 @@ pi install git:github.com/well1791/pi-sm
 
 - `/reload` hot-reloads only extensions in auto-discovered dirs (`~/.pi/agent/extensions/`, `.pi/extensions/`). **Installed packages are not hot-reloaded** — reinstall to pick up changes.
 - For fast iteration, symlink the repo (or just `src/`) into `~/.pi/agent/extensions/` and use `/reload`.
-- After changes, exercise both `/sm` and `/rename`.
+- After changes, exercise both `/sm` and `/rn`.
 
 ## Known issues (pre-existing in source)
 
@@ -61,14 +61,15 @@ The verbatim source has `tsc` errors against pi's type definitions. They are **r
 
 - `src/index.ts` — `matchesKey(data, "pageup" | <string>)`: 2nd param typed `KeyId`; string literals aren't members. Type-strictness only.
 - `src/dialogs.ts` — `ctx.ui.custom<…>()` generic arg, and a `SessionManager` private-constructor constraint. Type-level only.
-- `src/rename.ts:25` — `.filter()` on `message.content: string | Array<…>` without narrowing. **Genuine latent bug**: throws if `content` is ever a plain string (pi sends arrays in practice). Worth narrowing regardless.
+- `src/rename.ts:36` — `.filter()` on `message.content: string | Array<…>` without narrowing. **Genuine latent bug**: throws if `content` is ever a plain string (pi sends arrays in practice). Worth narrowing regardless.
 
 If you reintroduce a `typecheck` script + `tsconfig.json`, fix these first. Don't "fix" runtime-working code by accident — confirm a change actually improves runtime behavior.
 
 ## Config
 
-The `/sm` extension reads optional user config from `~/.pi/agent/session-manager.json` (path hardcoded in `src/config.ts` via `process.env.HOME`):
+The `/sm` extension reads optional user config from `~/.pi/agent/pi-sm.json` (path hardcoded in `src/config.ts` via `process.env.HOME`):
 
+- `commands` — override slash-command names (see `src/constants.ts` `DEFAULT_COMMANDS`); default `rename` → `rn`. Takes effect on extension reload.
 - `shortcuts` — override action keys (see `src/constants.ts` `DEFAULT_SHORTCUTS`).
 - `colors` — hex (`"#RRGGBB"`) or ANSI 256 (e.g. `"242"`); keys in `DEFAULT_COLORS`.
 

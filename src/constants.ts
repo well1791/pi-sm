@@ -25,3 +25,7 @@ export const DEFAULT_COLORS: Record<string, string> = {
   error: "#FF5F5F",
   shortcutKey: "#AFD7FF",
 };
+
+export const DEFAULT_COMMANDS: Record<string, string> = {
+  rename: "rn",
+};

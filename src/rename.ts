@@ -1,14 +1,25 @@
 /**
  * Session rename extension.
  *
- * /rename [name] - set name directly
- * /rename        - prompt with current name pre-filled for editing
- * ctrl+shift+n   - same as /rename (no args)
+ * /rn [name] - set name directly
+ * /rn        - prompt with current name pre-filled for editing
+ *
+ * The command name defaults to `rn` and is overridable via the `commands.rename`
+ * key in ~/.pi/agent/pi-sm.json (requires an extension reload to take effect).
  */
 
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
+import { loadConfig } from "./config.ts";
+import { DEFAULT_COMMANDS } from "./constants.ts";
 
 export default function (pi: ExtensionAPI) {
+	// Command name is read at load time; changing it requires an extension reload.
+	const cfg = loadConfig((msg) => console.error(`pi-sm: ${msg}`));
+	const renameCommand =
+		typeof cfg.commands.rename === "string" && cfg.commands.rename.trim()
+			? cfg.commands.rename.trim()
+			: DEFAULT_COMMANDS.rename;
+
 	async function promptRename(ctx: ExtensionContext) {
 		if (!ctx.hasUI) {
 			ctx.ui.notify("rename requires interactive mode", "error");
@@ -45,8 +56,8 @@ export default function (pi: ExtensionAPI) {
 		}
 	}
 
-	pi.registerCommand("rename", {
-		description: "Rename session (usage: /rename [name], or /rename to edit current name)",
+	pi.registerCommand(renameCommand, {
+		description: "Rename session (usage: /rn [name], or /rn to edit current name)",
 		handler: async (args, ctx) => {
 			const trimmed = args.trim();
 

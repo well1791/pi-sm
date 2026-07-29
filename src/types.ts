@@ -26,9 +26,13 @@ export type ShortcutKey =
   | "toggleHidden"
   | "select";
 
+/** Configurable slash-command names (overridable via the `commands` config section). */
+export type CommandName = "rename";
+
 export interface SMConfig {
   shortcuts: Record<ShortcutKey, string>;
   colors: Record<ColorKey, string>;
+  commands: Record<CommandName, string>;
 }
 
 export interface FlatItem {

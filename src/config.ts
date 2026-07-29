@@ -2,20 +2,21 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { DEFAULT_SHORTCUTS, DEFAULT_COLORS } from "./constants.ts";
+import { DEFAULT_SHORTCUTS, DEFAULT_COLORS, DEFAULT_COMMANDS } from "./constants.ts";
 import type { SMConfig, ColorKey } from "./types.ts";
 
 const CONFIG_PATH = join(
   process.env.HOME ?? "~",
   ".pi",
   "agent",
-  "session-manager.json",
+  "pi-sm.json",
 );
 
 export function loadConfig(notifyError: (msg: string) => void): SMConfig {
   const defaults: SMConfig = {
     shortcuts: { ...DEFAULT_SHORTCUTS } as SMConfig["shortcuts"],
     colors: { ...DEFAULT_COLORS } as SMConfig["colors"],
+    commands: { ...DEFAULT_COMMANDS } as SMConfig["commands"],
   };
 
   if (!existsSync(CONFIG_PATH)) return defaults;
@@ -40,9 +41,19 @@ export function loadConfig(notifyError: (msg: string) => void): SMConfig {
       }
     }
 
+    if (parsed.commands && typeof parsed.commands === "object") {
+      for (const [key, value] of Object.entries(parsed.commands)) {
+        if (key in defaults.commands && typeof value === "string") {
+          (defaults.commands as Record<string, string>)[key] = value;
+        }
+      }
+    }
+
     return defaults;
   } catch (err: any) {
-    notifyError(`session-manager: config error — ${err?.message ?? "invalid JSON"}`);
+    notifyError(
+      `pi-sm: config error — ${err?.message ?? "invalid JSON"}`,
+    );
     return defaults;
   }
 }
@@ -63,6 +74,10 @@ export function colorize(text: string, color: string): string {
 }
 
 /** Resolve a config color key and apply it to text */
-export function applyColor(text: string, key: ColorKey, config: SMConfig): string {
+export function applyColor(
+  text: string,
+  key: ColorKey,
+  config: SMConfig,
+): string {
   return colorize(text, config.colors[key]);
 }

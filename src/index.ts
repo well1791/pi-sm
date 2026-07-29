@@ -54,7 +54,7 @@ function trashOrDelete(filePath: string): boolean {
 
 export default function (pi: ExtensionAPI) {
   pi.registerCommand("sm", {
-    description: "Session manager -- browse, search, delete, create sessions",
+    description: "Lite session manager -- browse, search, rename, fork, hide, and delete sessions",
     handler: async (_args, ctx) => {
       const cfg = loadConfig((msg) => ctx.ui.notify(msg, "error"));
       const currentSessionFile = ctx.sessionManager.getSessionFile();
@@ -330,12 +330,12 @@ export default function (pi: ExtensionAPI) {
                 return;
               }
               if (matchesKey(data, "pageup")) {
-                cursorIndex = Math.max(0, cursorIndex - 8);
+                if (!renameMode) cursorIndex = Math.max(0, cursorIndex - VIEWPORT_SIZE);
                 tui.requestRender();
                 return;
               }
               if (matchesKey(data, "pagedown")) {
-                cursorIndex = Math.min(getDisplayCount() - 1, cursorIndex + 8);
+                if (!renameMode) cursorIndex = Math.min(getDisplayCount() - 1, cursorIndex + VIEWPORT_SIZE);
                 tui.requestRender();
                 return;
               }
