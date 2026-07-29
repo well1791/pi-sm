@@ -18,10 +18,10 @@ sessions — plus a quick `/rn` command. Two extensions ship in this package:
 
 ```fish
 # install (persists to pi settings)
-pi install git:github.com/well1791/pi-sm
+pi install npm:@well1791/pi-sm
 
 # or try it once for the current session only
-pi -e git:github.com/well1791/pi-sm
+pi -e npm:@well1791/pi-sm
 ```
 
 After installing, run `/sm` or `/rn` inside pi.
