@@ -1,0 +1,39 @@
+{
+  "name": "pi-sm",
+  "version": "0.1.0",
+  "description": "Session manager for the pi coding agent — a TUI to browse, search, rename, fork, hide, and delete sessions, plus a /rename command.",
+  "keywords": [
+    "pi-package",
+    "pi",
+    "pi-coding-agent",
+    "session-manager",
+    "session",
+    "tui",
+    "rename"
+  ],
+  "license": "MIT",
+  "author": "Wellington Mendoza <wellsaint91@gmail.com>",
+  "homepage": "https://github.com/well1791/pi-sm",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/well1791/pi-sm.git"
+  },
+  "bugs": {
+    "url": "https://github.com/well1791/pi-sm/issues"
+  },
+  "pi": {
+    "extensions": [
+      "./src/index.ts",
+      "./src/rename.ts"
+    ]
+  },
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*"
+  }
+}
