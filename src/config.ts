@@ -2,15 +2,14 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { DEFAULT_SHORTCUTS, DEFAULT_COLORS, DEFAULT_COMMANDS } from "./constants.ts";
+import {
+  DEFAULT_SHORTCUTS,
+  DEFAULT_COLORS,
+  DEFAULT_COMMANDS,
+} from "./constants.ts";
 import type { SMConfig, ColorKey } from "./types.ts";
 
-const CONFIG_PATH = join(
-  process.env.HOME ?? "~",
-  ".pi",
-  "agent",
-  "pi-sm.json",
-);
+const CONFIG_PATH = join(process.env.HOME ?? "~", ".pi", "agent", "pi-sm.json");
 
 export function loadConfig(notifyError: (msg: string) => void): SMConfig {
   const defaults: SMConfig = {
@@ -51,9 +50,7 @@ export function loadConfig(notifyError: (msg: string) => void): SMConfig {
 
     return defaults;
   } catch (err: any) {
-    notifyError(
-      `pi-sm: config error — ${err?.message ?? "invalid JSON"}`,
-    );
+    notifyError(`pi-sm: config error — ${err?.message ?? "invalid JSON"}`);
     return defaults;
   }
 }

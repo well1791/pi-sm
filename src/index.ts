@@ -7,11 +7,7 @@ import { execFileSync } from "node:child_process";
 import { VIEWPORT_SIZE } from "./constants.ts";
 import type { FlatItem, Scope, SessionMeta } from "./types.ts";
 import { loadConfig } from "./config.ts";
-import {
-  buildTree,
-  loadSessionMeta,
-  collectDescendantPaths,
-} from "./tree.ts";
+import { buildTree, loadSessionMeta, collectDescendantPaths } from "./tree.ts";
 import {
   renderTopBar,
   renderItemLine,
@@ -20,10 +16,7 @@ import {
   renderHelpLine,
   renderPaginationLine,
 } from "./render.ts";
-import {
-  showModelMismatchDialog,
-  showTreePicker,
-} from "./dialogs.ts";
+import { showModelMismatchDialog, showTreePicker } from "./dialogs.ts";
 
 /**
  * Async trash/delete using pi.exec() instead of execSync.
@@ -54,7 +47,8 @@ function trashOrDelete(filePath: string): boolean {
 
 export default function (pi: ExtensionAPI) {
   pi.registerCommand("sm", {
-    description: "Lite session manager -- browse, search, rename, fork, hide, and delete sessions",
+    description:
+      "Lite session manager -- browse, search, rename, fork, hide, and delete sessions",
     handler: async (_args, ctx) => {
       const cfg = loadConfig((msg) => ctx.ui.notify(msg, "error"));
       const currentSessionFile = ctx.sessionManager.getSessionFile();
@@ -63,7 +57,7 @@ export default function (pi: ExtensionAPI) {
       let scope: Scope = "project";
       let allItems: FlatItem[] = [];
       let filteredItems: FlatItem[] = [];
-      let selectedPaths = new Set<string>();
+      const selectedPaths = new Set<string>();
       let cursorIndex = 0;
       let scrollOffset = 0;
       let query = "";
@@ -225,7 +219,9 @@ export default function (pi: ExtensionAPI) {
                 lines.push(theme.fg("muted", "  Loading..."));
               } else {
                 const displayCount = getDisplayCount();
-                const hiddenCount = allItems.filter((item) => item.session.name?.startsWith(".")).length;
+                const hiddenCount = allItems.filter((item) =>
+                  item.session.name?.startsWith("."),
+                ).length;
                 const hasCreate = query.trim() && filteredItems.length === 0;
 
                 if (displayCount === 0) {
@@ -245,7 +241,15 @@ export default function (pi: ExtensionAPI) {
                   for (let i = scrollOffset; i < displayCount; i++) {
                     let itemLines: string[];
                     if (hasCreate && i === filteredItems.length) {
-                      itemLines = [renderCreateLine({ index: i, width, cursorIndex, query, config: cfg })];
+                      itemLines = [
+                        renderCreateLine({
+                          index: i,
+                          width,
+                          cursorIndex,
+                          query,
+                          config: cfg,
+                        }),
+                      ];
                     } else {
                       itemLines = renderItemLine({
                         item: filteredItems[i],
@@ -260,15 +264,29 @@ export default function (pi: ExtensionAPI) {
                         showHidden,
                       });
                     }
-                    if (linesRendered + itemLines.length > VIEWPORT_SIZE && itemsShown > 0) break;
+                    if (
+                      linesRendered + itemLines.length > VIEWPORT_SIZE &&
+                      itemsShown > 0
+                    )
+                      break;
                     lines.push(...itemLines);
                     linesRendered += itemLines.length;
                     itemsShown++;
                   }
 
-                  if (scrollOffset > 0 || scrollOffset + itemsShown < displayCount || hiddenCount > 0) {
+                  if (
+                    scrollOffset > 0 ||
+                    scrollOffset + itemsShown < displayCount ||
+                    hiddenCount > 0
+                  ) {
                     lines.push(
-                      renderPaginationLine(scrollOffset, itemsShown, displayCount, hiddenCount, cfg),
+                      renderPaginationLine(
+                        scrollOffset,
+                        itemsShown,
+                        displayCount,
+                        hiddenCount,
+                        cfg,
+                      ),
                     );
                   }
                 }
@@ -277,16 +295,26 @@ export default function (pi: ExtensionAPI) {
               // Selection count
               if (selectedPaths.size > 0) {
                 lines.push(
-                  theme.fg("error", `  ${selectedPaths.size} selected for deletion`),
+                  theme.fg(
+                    "error",
+                    `  ${selectedPaths.size} selected for deletion`,
+                  ),
                 );
               }
 
               // Status line (metadata for focused item)
-              const focusedItem = cursorIndex < filteredItems.length ? filteredItems[cursorIndex] : undefined;
-              const meta = focusedItem ? metaCache.get(focusedItem.session.path) : undefined;
-              const contextUsage = currentSessionFile && focusedItem?.session.path === currentSessionFile
-                ? ctx.getContextUsage()
+              const focusedItem =
+                cursorIndex < filteredItems.length
+                  ? filteredItems[cursorIndex]
+                  : undefined;
+              const meta = focusedItem
+                ? metaCache.get(focusedItem.session.path)
                 : undefined;
+              const contextUsage =
+                currentSessionFile &&
+                focusedItem?.session.path === currentSessionFile
+                  ? ctx.getContextUsage()
+                  : undefined;
               lines.push(
                 renderStatusLine({
                   width,
@@ -307,9 +335,7 @@ export default function (pi: ExtensionAPI) {
 
               // Help + bottom bar
               lines.push(renderHelpLine({ width, config: cfg, renameMode }));
-              lines.push(
-                theme.fg("dim", "─".repeat(width)),
-              );
+              lines.push(theme.fg("dim", "─".repeat(width)));
 
               return lines;
             },
@@ -330,12 +356,17 @@ export default function (pi: ExtensionAPI) {
                 return;
               }
               if (matchesKey(data, "pageup")) {
-                if (!renameMode) cursorIndex = Math.max(0, cursorIndex - VIEWPORT_SIZE);
+                if (!renameMode)
+                  cursorIndex = Math.max(0, cursorIndex - VIEWPORT_SIZE);
                 tui.requestRender();
                 return;
               }
               if (matchesKey(data, "pagedown")) {
-                if (!renameMode) cursorIndex = Math.min(getDisplayCount() - 1, cursorIndex + VIEWPORT_SIZE);
+                if (!renameMode)
+                  cursorIndex = Math.min(
+                    getDisplayCount() - 1,
+                    cursorIndex + VIEWPORT_SIZE,
+                  );
                 tui.requestRender();
                 return;
               }
@@ -356,11 +387,12 @@ export default function (pi: ExtensionAPI) {
 
               // Hard Delete (immediate)
               if (matchesKey(data, cfg.shortcuts.delete)) {
-                const targets = selectedPaths.size > 0
-                  ? [...selectedPaths]
-                  : cursorIndex < filteredItems.length
-                    ? [filteredItems[cursorIndex].session.path]
-                    : [];
+                const targets =
+                  selectedPaths.size > 0
+                    ? [...selectedPaths]
+                    : cursorIndex < filteredItems.length
+                      ? [filteredItems[cursorIndex].session.path]
+                      : [];
                 if (targets.length === 0) return;
                 const toDelete = new Set<string>();
                 for (const p of targets) {
@@ -382,11 +414,12 @@ export default function (pi: ExtensionAPI) {
 
               // Soft Delete (toggle dot-prefix, includes descendants)
               if (matchesKey(data, cfg.shortcuts.softDelete)) {
-                const rootPaths = selectedPaths.size > 0
-                  ? [...selectedPaths]
-                  : cursorIndex < filteredItems.length
-                    ? [filteredItems[cursorIndex].session.path]
-                    : [];
+                const rootPaths =
+                  selectedPaths.size > 0
+                    ? [...selectedPaths]
+                    : cursorIndex < filteredItems.length
+                      ? [filteredItems[cursorIndex].session.path]
+                      : [];
                 if (rootPaths.length === 0) return;
                 // Expand to include descendants
                 const allPaths = new Set<string>();
@@ -401,12 +434,22 @@ export default function (pi: ExtensionAPI) {
                   .filter(Boolean) as FlatItem[];
                 if (targets.length === 0) return;
                 const allHidden = targets.every((item) => {
-                  const name = item.session.name ?? item.session.firstMessage?.replace(/\n/g, " ").slice(0, 40) ?? "session";
+                  const name =
+                    item.session.name ??
+                    item.session.firstMessage
+                      ?.replace(/\n/g, " ")
+                      .slice(0, 40) ??
+                    "session";
                   return name.startsWith(".");
                 });
                 let count = 0;
                 for (const item of targets) {
-                  const currentName = item.session.name ?? item.session.firstMessage?.replace(/\n/g, " ").slice(0, 40) ?? "session";
+                  const currentName =
+                    item.session.name ??
+                    item.session.firstMessage
+                      ?.replace(/\n/g, " ")
+                      .slice(0, 40) ??
+                    "session";
                   try {
                     const sm = SessionManager.open(item.session.path);
                     if (allHidden) {
@@ -415,7 +458,9 @@ export default function (pi: ExtensionAPI) {
                       sm.appendSessionInfo(`.${currentName}`);
                     }
                     count++;
-                  } catch { /* skip failures */ }
+                  } catch {
+                    /* skip failures */
+                  }
                 }
                 selectedPaths.clear();
                 showStatus(allHidden ? `Unhidden ${count}` : `Hidden ${count}`);
@@ -447,7 +492,10 @@ export default function (pi: ExtensionAPI) {
                 if (hasCreate && cursorIndex === filteredItems.length) {
                   done({ action: "create", name: query.trim() });
                 } else if (cursorIndex < filteredItems.length) {
-                  done({ action: "resume", path: filteredItems[cursorIndex].session.path });
+                  done({
+                    action: "resume",
+                    path: filteredItems[cursorIndex].session.path,
+                  });
                 }
                 return;
               }
@@ -512,7 +560,10 @@ export default function (pi: ExtensionAPI) {
               }
 
               // Text input cursor movement
-              if (matchesKey(data, Key.home) || matchesKey(data, Key.ctrl("a"))) {
+              if (
+                matchesKey(data, Key.home) ||
+                matchesKey(data, Key.ctrl("a"))
+              ) {
                 qCursor = 0;
                 tui.requestRender();
                 return;
@@ -599,7 +650,9 @@ export default function (pi: ExtensionAPI) {
 
               // Bracketed paste
               if (data.startsWith("\x1b[200~")) {
-                const text = data.replace(/\x1b\[200~/g, "").replace(/\x1b\[201~/g, "");
+                const text = data
+                  .replace(/\x1b\[200~/g, "")
+                  .replace(/\x1b\[201~/g, "");
                 if (text.length > 0) {
                   query = query.slice(0, qCursor) + text + query.slice(qCursor);
                   qCursor += text.length;
@@ -665,14 +718,21 @@ export default function (pi: ExtensionAPI) {
 
         if (result.action === "resume") {
           // Model mismatch check
-          const targetMeta = metaCache.get(result.path) ?? loadSessionMeta(result.path);
+          const targetMeta =
+            metaCache.get(result.path) ?? loadSessionMeta(result.path);
           const activeModel = ctx.model
             ? `${ctx.model.provider}/${ctx.model.id}`
             : null;
 
-          if (targetMeta.model && activeModel && targetMeta.model !== activeModel) {
-            const sessionModelDisplay = targetMeta.model.split("/").pop() ?? targetMeta.model;
-            const activeModelDisplay = ctx.model?.name ?? ctx.model?.id ?? activeModel;
+          if (
+            targetMeta.model &&
+            activeModel &&
+            targetMeta.model !== activeModel
+          ) {
+            const sessionModelDisplay =
+              targetMeta.model.split("/").pop() ?? targetMeta.model;
+            const activeModelDisplay =
+              ctx.model?.name ?? ctx.model?.id ?? activeModel;
             const choice = await showModelMismatchDialog(
               ctx,
               sessionModelDisplay,

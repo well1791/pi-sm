@@ -19,16 +19,27 @@ interface RenderItemOptions {
 }
 
 export function renderItemLine(opts: RenderItemOptions): string[] {
-  const { item, index, width, cursorIndex, selectedPaths, currentSessionFile, scope, cwd, config } = opts;
+  const {
+    item,
+    index,
+    width,
+    cursorIndex,
+    selectedPaths,
+    currentSessionFile,
+    scope,
+    cwd,
+    config,
+  } = opts;
   const isCursor = index === cursorIndex;
   const isSelected = selectedPaths.has(item.session.path);
   const isCurrent = item.session.path === currentSessionFile;
   const hasName = !!item.session.name;
   const isHidden = hasName && item.session.name!.startsWith(".");
-  const isSubagentWorker = hasName && item.session.name!.startsWith("subagent-worker-");
+  const isSubagentWorker =
+    hasName && item.session.name!.startsWith("subagent-worker-");
   const isOutside = item.session.cwd && item.session.cwd !== cwd;
   const isInCwd = item.session.cwd && item.session.cwd === cwd;
-  const isRecent = (Date.now() - item.session.modified.getTime()) < 3600000;
+  const isRecent = Date.now() - item.session.modified.getTime() < 3600000;
 
   // Tree prefix
   let prefix = "";
@@ -62,7 +73,8 @@ export function renderItemLine(opts: RenderItemOptions): string[] {
     item.session.firstMessage?.replace(/\n/g, " ").slice(0, 60) ??
     "(empty session)";
 
-  const childTag = isSelected && item.childCount > 0 ? ` [+${item.childCount}]` : "";
+  const childTag =
+    isSelected && item.childCount > 0 ? ` [+${item.childCount}]` : "";
   const time = relativeTime(item.session.modified);
 
   const shortPath =
@@ -74,10 +86,17 @@ export function renderItemLine(opts: RenderItemOptions): string[] {
   const pathRaw = shortPath ? ` ${shortPath} ` : "";
   const rightRaw = ` ${time} `;
   const chevronStr = isCursor ? "❯ " : "  ";
-  const availForContent = width - 2 - visibleWidth(pathRaw) - visibleWidth(rightRaw);
-  const contentTrunc = truncateToWidth(contentRaw, Math.max(availForContent, 10));
+  const availForContent =
+    width - 2 - visibleWidth(pathRaw) - visibleWidth(rightRaw);
+  const contentTrunc = truncateToWidth(
+    contentRaw,
+    Math.max(availForContent, 10),
+  );
   const contentW = visibleWidth(contentTrunc);
-  const gap = Math.max(1, width - 2 - contentW - visibleWidth(pathRaw) - visibleWidth(rightRaw));
+  const gap = Math.max(
+    1,
+    width - 2 - contentW - visibleWidth(pathRaw) - visibleWidth(rightRaw),
+  );
 
   const colorKey = isSelected
     ? "error"
@@ -93,7 +112,8 @@ export function renderItemLine(opts: RenderItemOptions): string[] {
               ? "text"
               : "unnamed";
 
-  const color = config.colors[colorKey as keyof typeof config.colors] ?? config.colors.text;
+  const color =
+    config.colors[colorKey as keyof typeof config.colors] ?? config.colors.text;
   const dimColor = config.colors.muted;
 
   const coloredBody = shortPath
@@ -102,7 +122,9 @@ export function renderItemLine(opts: RenderItemOptions): string[] {
       colorize(rightRaw, color)
     : colorize(contentTrunc + " ".repeat(gap) + rightRaw, color);
 
-  const coloredChevron = isCursor ? applyColor(chevronStr, "gold", config) : "  ";
+  const coloredChevron = isCursor
+    ? applyColor(chevronStr, "gold", config)
+    : "  ";
   const fullLine = coloredChevron + coloredBody;
   const mainLine = isCursor ? `\x1b[48;5;236m${fullLine}\x1b[49m` : fullLine;
 
@@ -123,7 +145,9 @@ export function renderCreateLine(opts: RenderCreateOptions): string {
   const chevronStr = isCursor ? applyColor("❯ ", "gold", config) : "  ";
   const label = `  Create a new session named: "${query.trim()}"  (press enter)`;
   const full = truncateToWidth(label, width - 2);
-  const coloredBody = isCursor ? applyColor(full, "text", config) : applyColor(full, "muted", config);
+  const coloredBody = isCursor
+    ? applyColor(full, "text", config)
+    : applyColor(full, "muted", config);
   const line = chevronStr + coloredBody;
   return isCursor ? `\x1b[48;5;236m${line}\x1b[49m` : line;
 }
@@ -138,7 +162,8 @@ interface RenderStatusOptions {
 }
 
 export function renderStatusLine(opts: RenderStatusOptions): string {
-  const { width, focusedItem, meta, currentSessionFile, contextUsage, config } = opts;
+  const { width, focusedItem, meta, currentSessionFile, contextUsage, config } =
+    opts;
 
   let left = "";
   if (focusedItem) {
@@ -151,14 +176,15 @@ export function renderStatusLine(opts: RenderStatusOptions): string {
     } else if (meta && meta.estimatedTokens > 0) {
       const tokens = meta.estimatedTokens;
       const estimated = (tokens / 200000) * 100;
-      const tokenLabel = tokens >= 1000000
-        ? `${(tokens / 1000000).toFixed(1)}M`
-        : `${Math.round(tokens / 1000)}k`;
+      const tokenLabel =
+        tokens >= 1000000
+          ? `${(tokens / 1000000).toFixed(1)}M`
+          : `${Math.round(tokens / 1000)}k`;
       ctxPct = `~${estimated.toFixed(1)}%/${tokenLabel}`;
     }
 
     const modelName = meta?.model
-      ? meta.model.split("/").pop() ?? "--"
+      ? (meta.model.split("/").pop() ?? "--")
       : "--";
 
     left = `  ${msgCount} · ${ctxPct} · ${modelName}`;
@@ -194,23 +220,52 @@ export function renderHelpLine(opts: RenderHelpOptions): string {
   const mutedColor = config.colors.muted;
 
   if (renameMode) {
-    return "  " +
-      colorize("type", mutedColor) + " " +
-      colorize("new name", mutedColor) + "  " +
-      colorize("enter", keyColor) + " " +
-      colorize("save", mutedColor) + "  " +
-      colorize("esc", keyColor) + " " +
-      colorize("cancel", mutedColor);
+    return (
+      "  " +
+      colorize("type", mutedColor) +
+      " " +
+      colorize("new name", mutedColor) +
+      "  " +
+      colorize("enter", keyColor) +
+      " " +
+      colorize("save", mutedColor) +
+      "  " +
+      colorize("esc", keyColor) +
+      " " +
+      colorize("cancel", mutedColor)
+    );
   }
 
-  return "  " +
-    colorize("tab", keyColor) + " " + colorize("sel", mutedColor) + "  " +
-    colorize("^R", keyColor) + " " + colorize("rename", mutedColor) + "  " +
-    colorize("^F", keyColor) + " " + colorize("fork", mutedColor) + "  " +
-    colorize("^M", keyColor) + " " + colorize("scope", mutedColor) + "  " +
-    colorize("^D", keyColor) + " " + colorize("s-del", mutedColor) + "  " +
-    colorize("^X", keyColor) + " " + colorize("h-del", mutedColor) + "  " +
-    colorize("^H", keyColor) + " " + colorize("hidden", mutedColor);
+  return (
+    "  " +
+    colorize("tab", keyColor) +
+    " " +
+    colorize("sel", mutedColor) +
+    "  " +
+    colorize("^R", keyColor) +
+    " " +
+    colorize("rename", mutedColor) +
+    "  " +
+    colorize("^F", keyColor) +
+    " " +
+    colorize("fork", mutedColor) +
+    "  " +
+    colorize("^M", keyColor) +
+    " " +
+    colorize("scope", mutedColor) +
+    "  " +
+    colorize("^D", keyColor) +
+    " " +
+    colorize("s-del", mutedColor) +
+    "  " +
+    colorize("^X", keyColor) +
+    " " +
+    colorize("h-del", mutedColor) +
+    "  " +
+    colorize("^H", keyColor) +
+    " " +
+    colorize("hidden", mutedColor)
+  );
 }
 
 interface RenderTopBarOptions {
@@ -232,7 +287,7 @@ export function renderTopBar(opts: RenderTopBarOptions): string[] {
   const modeLabel = renameMode ? " Rename Session " : " Session Manager ";
   lines.push(
     applyColor(modeLabel, "border", config) +
-    applyColor(`[${scopeLabel}]`, "muted", config),
+      applyColor(`[${scopeLabel}]`, "muted", config),
   );
 
   const before = query.slice(0, qCursor);

@@ -45,14 +45,22 @@ export function buildTree(sessions: SessionInfo[]): FlatItem[] {
   function countDescendants(path: string): number {
     if (descendantCache.has(path)) return descendantCache.get(path)!;
     const kids = childrenOf.get(path) ?? [];
-    const count = kids.reduce((sum, c) => sum + 1 + countDescendants(c.path), 0);
+    const count = kids.reduce(
+      (sum, c) => sum + 1 + countDescendants(c.path),
+      0,
+    );
     descendantCache.set(path, count);
     return count;
   }
 
   const result: FlatItem[] = [];
 
-  function walk(s: SessionInfo, depth: number, isLast: boolean, ancestors: boolean[]) {
+  function walk(
+    s: SessionInfo,
+    depth: number,
+    isLast: boolean,
+    ancestors: boolean[],
+  ) {
     result.push({
       session: s,
       depth,

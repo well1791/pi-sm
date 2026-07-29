@@ -9,10 +9,10 @@ Lite session manager for the [pi](https://pi.dev) coding agent.
 An interactive TUI to **browse, search, rename, fork, hide, and delete** pi
 sessions — plus a quick `/rn` command. Two extensions ship in this package:
 
-| Extension      | Command | What it does                                                       |
-| -------------- | ------- | ------------------------------------------------------------------ |
-| `src/index.ts` | `/sm`   | Full-screen session browser: list, filter, rename, fork, delete.   |
-| `src/rename.ts`| `/rn`   | Rename the current session inline (`/rn [name]`, or `/rn` to edit). |
+| Extension       | Command | What it does                                                        |
+| --------------- | ------- | ------------------------------------------------------------------- |
+| `src/index.ts`  | `/sm`   | Full-screen session browser: list, filter, rename, fork, delete.    |
+| `src/rename.ts` | `/rn`   | Rename the current session inline (`/rn [name]`, or `/rn` to edit). |
 
 ## Install
 
@@ -32,24 +32,24 @@ Opens a full-screen TUI over your sessions.
 
 ### Navigation
 
-| Key            | Action                                        |
-| -------------- | --------------------------------------------- |
-| `↑` / `↓`      | Move cursor                                   |
-| `PageUp` / `PageDown` | Jump by 8                              |
-| `Enter`        | Resume session · create session (on empty search) · confirm rename |
-| `Tab`          | Toggle selection on focused session           |
-| `Esc`          | Cancel rename · clear selection · exit        |
+| Key                   | Action                                                             |
+| --------------------- | ------------------------------------------------------------------ |
+| `↑` / `↓`             | Move cursor                                                        |
+| `PageUp` / `PageDown` | Jump by 8                                                          |
+| `Enter`               | Resume session · create session (on empty search) · confirm rename |
+| `Tab`                 | Toggle selection on focused session                                |
+| `Esc`                 | Cancel rename · clear selection · exit                             |
 
 ### Actions
 
-| Key      | Action                                                                 |
-| -------- | ---------------------------------------------------------------------- |
+| Key      | Action                                                                                |
+| -------- | ------------------------------------------------------------------------------------- |
 | `Ctrl+X` | **Delete** — hard delete (trash if available, else `rm -rf`); cascades to descendants |
-| `Ctrl+D` | **Soft delete** — toggle hide/unhide via `.`-name prefix; includes descendants |
-| `Ctrl+R` | **Rename** the focused session                                         |
-| `Ctrl+F` | **Fork** the focused session (pick a branch point)                     |
-| `Ctrl+M` | Toggle **scope**: current project ↔ all sessions                       |
-| `Ctrl+H` | Toggle showing **hidden** sessions                                     |
+| `Ctrl+D` | **Soft delete** — toggle hide/unhide via `.`-name prefix; includes descendants        |
+| `Ctrl+R` | **Rename** the focused session                                                        |
+| `Ctrl+F` | **Fork** the focused session (pick a branch point)                                    |
+| `Ctrl+M` | Toggle **scope**: current project ↔ all sessions                                      |
+| `Ctrl+H` | Toggle showing **hidden** sessions                                                    |
 
 ### Search / text input
 
