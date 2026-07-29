@@ -4,6 +4,7 @@ import { SessionManager } from "@earendil-works/pi-coding-agent";
 import type { SessionEntry } from "@earendil-works/pi-coding-agent";
 import { matchesKey, Key, truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
 import { colorize } from "./config.ts";
+import { VIEWPORT_SIZE } from "./constants.ts";
 import type { SMConfig } from "./types.ts";
 
 type ModelChoice = "switch" | "keep" | "cancel";
@@ -218,7 +219,7 @@ export async function showTreePicker(
         if (tpFiltered.length === 0) {
           lines.push(colorize("  No matching messages", mutedColor));
         } else {
-          const maxLines = 11;
+          const maxLines = VIEWPORT_SIZE;
           if (tpCursor < tpScroll) tpScroll = tpCursor;
           else if (tpCursor >= tpScroll + maxLines) tpScroll = tpCursor - maxLines + 1;
 
@@ -284,6 +285,20 @@ export async function showTreePicker(
           let next = tpCursor + 1;
           while (next < tpFiltered.length && tpFiltered[next].role === "user") next++;
           if (next < tpFiltered.length) tpCursor = next;
+          tui.requestRender(); return;
+        }
+        if (matchesKey(data, "pageup")) {
+          if (tpFiltered.length === 0) { tui.requestRender(); return; }
+          let next = Math.max(0, tpCursor - VIEWPORT_SIZE);
+          while (next > 0 && tpFiltered[next].role === "user") next--;
+          if (tpFiltered[next].role === "assistant") tpCursor = next;
+          tui.requestRender(); return;
+        }
+        if (matchesKey(data, "pagedown")) {
+          if (tpFiltered.length === 0) { tui.requestRender(); return; }
+          let next = Math.min(tpFiltered.length - 1, tpCursor + VIEWPORT_SIZE);
+          while (next < tpFiltered.length - 1 && tpFiltered[next].role === "user") next++;
+          if (tpFiltered[next].role === "assistant") tpCursor = next;
           tui.requestRender(); return;
         }
         if (matchesKey(data, Key.backspace)) {
