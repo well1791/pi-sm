@@ -121,6 +121,21 @@ Releases are fully automated by [semantic-release](https://github.com/semantic-r
 
 ### Conventional Commits (required — this is how you drive the version)
 
+Every commit MUST follow [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/). Structure:
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+- Indicate a breaking change with `!` after the type/scope (`feat!: …`) and/or a `BREAKING CHANGE:` footer — the one token that MUST be uppercase.
+- A change that fits more than one type should be split into separate commits when possible.
+
+The `type` drives the semantic-release version bump:
+
 | Syntax                                                            | Effect     |
 | ----------------------------------------------------------------- | ---------- |
 | `feat(scope): …`                                                  | minor      |
